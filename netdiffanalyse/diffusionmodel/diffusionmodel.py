@@ -4,11 +4,13 @@ Created on Fri Mar 18 11:13:13 2022
 
 @author: jnevin
 -Supports ndlib CompositeModels
+-Doesn't support cascading or conditional compartments
 """
 
 import ndlib.models.ModelConfig as mc
 import ndlib.models.CompositeModel as gc
 import ndlib.models.compartments as cpm
+from ndlib.utils import multi_runs
 
 class CustomDiffusionModel:
     def __init__(self, model_name, statuses, compartments, transition_rules, 
@@ -49,4 +51,13 @@ class InitialisedDiffusionModel:
         for parameter in self.custom_diffusion_model.parameters:
             config.add_model_parameter(*parameter)
         self.model.set_initial_status(config)
+        
+class RunDiffusionModel:
+    def __init__(self, initialised_diffusion_model, parameters):
+        self.initialised_diffusion_model = initialised_diffusion_model
+        self.parameters = parameters
+        
+    def run_simulations(self):
+        self.trends = multi_runs(self.initialised_diffusion_model.model, 
+                                 *self.parameters)
     
