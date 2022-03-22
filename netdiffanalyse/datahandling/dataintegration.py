@@ -50,27 +50,24 @@ class FeatureSetup:
         self.compares = compares
         self.df = df
         
-    def initialise_indexer(self):
         indexer = recordlinkage.Index()
-        for block_type in self.blocks:
+        for block_type in blocks:
             block_type_fun = getattr(recordlinkage.index, block_type)
-            for attribute_block in self.blocks[block_type]:
+            for attribute_block in blocks[block_type]:
                 indexer.add(block_type_fun(*attribute_block))
         self.indexer = indexer
 
-    def get_candidate_links(self):
-        self.candidate_links = self.indexer.index(self.df)
+        self.candidate_links = indexer.index(df)
         
-    def initialise_comparer(self):
         comparer = recordlinkage.Compare()
-        for comp_type in self.compares:
+        for comp_type in compares:
             comp_type_fun = getattr(recordlinkage.compare, comp_type)
-            for attribute_comp in self.compares[comp_type]:
+            for attribute_comp in compares[comp_type]:
                 comparer.add(comp_type_fun(*attribute_comp))
         self.comparer = comparer
         
     def calculate_features(self):
-        self.features = self.comparer.compute(self.candidate_links, self.df)
+        return(self.comparer.compute(self.candidate_links, self.df))
 
 class MatchClassifierFit:
     '''
