@@ -7,17 +7,24 @@ Created on Fri Mar 18 15:18:23 2022
 import networkx as nx
 
 class ResultsAnalyser:
-    def __init__(self, run_diffusion_model):
-        self.run_diffusion_model = run_diffusion_model
-        self.graph = run_diffusion_model.initialised_diffusion_model.graph
-        self.trends = run_diffusion_model.trends
+    def __init__(self, graph, trends):
+        self.graph = graph
+        self.trends = trends
         
-    def calculate_graph_properties(self):
-        self.num_nodes = len(self.graph.nodes())
-        self.num_edges = len(self.graph.edges())
-        self.connected = nx.is_connected(self.graph)
-        self.degree_centrality = nx.degree_centrality(self.graph)
-        self.betweenness = nx.betweenness_centrality(self.graph)
-        self.closeness = nx.closeness_centrality(self.graph)
+    def get_graph_properties(self):
+        num_nodes = len(self.graph.nodes())
+        num_edges = len(self.graph.edges())
+        connected = nx.is_connected(self.graph)
+        degree_cent = nx.degree_centrality(self.graph)
+        betweenness = nx.betweenness_centrality(self.graph)
+        closeness = nx.closeness_centrality(self.graph)
+        
+        properties_dict = {'num_nodes': num_nodes, 'num_edges': num_edges,
+                           'connected': connected, 'degree_cent': degree_cent,
+                           'betweenness': betweenness, 'closeness': closeness}
+        
+        return properties_dict
+    
+    
         
         

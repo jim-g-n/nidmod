@@ -4,101 +4,103 @@ Created on Wed Mar 16 16:36:59 2022
 
 @author: jnevin
 
--Blocks and comparisons need to match format of recordlinkage and be included
- in the rl library
--Classifier needs to be valid recordlinkagetoolkit classifier
 """
 
-import networkx as nx
-import numpy as np
-from cdlib import algorithms
 import recordlinkage
 import recordlinkage.index
 import recordlinkage.compare
+import netdiffanalyse.integration_utils
 
-def walktrap_integration(graph, matches):
-    adj_graph = graph.copy()
-    match_graph = nx.Graph()
-    match_graph.add_edges_from(list(matches))
-    
-    S = [match_graph.subgraph(c).copy() for c in nx.connected_components(match_graph)]
-    S_com = []
-    for s_subgraph in S:
-        node_names = list(s_subgraph.nodes())
-
-        rename = dict(zip((node_names), np.arange(len(node_names))))
-        rev_rename = { v:k for k,v in rename.items()}
-
-        s_subgraph = nx.relabel_nodes(s_subgraph, rename)
-        communities = algorithms.walktrap(s_subgraph).communities
-        for community in communities:
-            S_com.append([rev_rename.get(item,item)  for item in community])
-
-    for component in S_com:
-        for node in component[1:]:
-            if node in adj_graph.nodes() and component[0] in adj_graph.nodes():
-                adj_graph = nx.contracted_nodes(adj_graph, component[0], node, self_loops = False)
-
-    return adj_graph
     
 class FeatureSetup:
     '''
     A class to store feature setups
+    
+    Inputs are dictionaries for blocks and attribute comparisons, and dataframe(s)
+    
+    Can calculate a set of comparison features to be used in a match classifier
+    
+    Blocks and attribute comparisons need to be provided in a format accepted by recordlinkage
     '''
-    def __init__(self, blocks, compares, df):
+    def __init__(self, blocks, compares, network_A_df, network_B_df = None):
         self.blocks = blocks
         self.compares = compares
-        self.df = df
+        self.network_A_df = network_A_df
+        if network_B_df is not None:
+            self.network_B_df = network_B_df
         
+        # create the indexer object based on the blocks provided
         indexer = recordlinkage.Index()
         for block_type in blocks:
             block_type_fun = getattr(recordlinkage.index, block_type)
             for attribute_block in blocks[block_type]:
                 indexer.add(block_type_fun(*attribute_block))
         self.indexer = indexer
-
-        self.candidate_links = indexer.index(df)
         
+        # create the comparer object based on the comparisons provided
         comparer = recordlinkage.Compare()
         for comp_type in compares:
             comp_type_fun = getattr(recordlinkage.compare, comp_type)
             for attribute_comp in compares[comp_type]:
                 comparer.add(comp_type_fun(*attribute_comp))
         self.comparer = comparer
-        
-    def calculate_features(self):
-        return(self.comparer.compute(self.candidate_links, self.df))
 
-class MatchClassifierFit:
+        # create the candidate links based on whether there are two dataframes
+        if network_B_df is not None:
+            self.candidate_links = indexer.index(network_A_df, network_B_df)
+        else:
+            self.candidate_links = indexer.index(network_A_df)
+    
+    # 
+    def calculate_features(self):
+        if hasattr(self, 'network_B_df'):
+            return(self.comparer.compute(self.candidate_links, self.network_A_df, self.network_B_df))
+        else:
+            return(self.comparer.compute(self.candidate_links, self.network_A_df))
+
+class MatchClassifier:
     '''
-    A class for fitting classifier
+    A class for fitting a match classifier
+    
+    Inputs are the name of the classifier, and sets of training features and matches
+    
+    Classifier needs to be a valid recordlinkage classifier
+    
+    Returns a fit match classifier model
     '''
-    def __init__(self, classifier, training_features, training_matches):
+    def __init__(self, match_classifier_name, training_features, training_matches = None):
         self.training_features = training_features
-        self.training_matches = training_matches
-        self.classifier = classifier
+        self.match_classifier_name = match_classifier_name
+        if training_matches is not None:
+            self.training_matches = training_matches
     
     def fit_model(self):
-        model = getattr(recordlinkage, self.classifier)()
-        model.fit(self.training_features, self.training_matches)
-        self.fit_classifier = model
+        model = getattr(recordlinkage, self.match_classifier_name)()
+        if hasattr(self, 'training_matches'): 
+            model.fit(self.training_features, self.training_matches)
+        else:
+            model.fit(self.training_features)
+        return model
         
-    def pred_matches(self, features):
-        matches = self.fit_classifier.predict(features)
-        return matches
     
-class NetworkIntegration:
+class NetworkIntegrator:
     '''
     A class for integrating a network with matches and a graph
+    
+    Inputs are one or more graphs and nodes that are identified as the same entity, plus an integration algorithm
+    
+    Clustering algorithm needs to receive a list of graphs, a set of matches, and return a single graph
+    
+    Can return the integrated network based on the matches
     '''
-    def __init__(self, graph, matches, clustering_alg):
-        self.graph = graph
+    def __init__(self, graphs, matches, clustering_alg):
+        self.graphs = graphs
         self.matches = matches
         self.clustering_alg = clustering_alg
         
     def integrate_network(self):
-        used_clustering_alg = eval(self.clustering_alg)
-        self.adj_graph = used_clustering_alg(self.graph, self.matches)
+        used_clustering_alg = getattr(netdiffanalyse.integration_utils, self.clustering_alg)
+        return used_clustering_alg(self.graphs, self.matches)
         
         
         
