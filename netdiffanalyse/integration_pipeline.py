@@ -69,5 +69,7 @@ class IntegrationPipeline:
         self.model = initialised_diffusion_model.get_initialised_model()
         self.trends = initialised_diffusion_model.run_diffusion_model(simulation_parameters)
         
-        self.results_analyser = ResultsAnalyser(self.integrated_network, self.trends)
+        self.results_analyser = ResultsAnalyser(self.model, self.integrated_network, self.trends)
+        
+        
         
