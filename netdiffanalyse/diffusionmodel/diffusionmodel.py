@@ -13,6 +13,7 @@ import ndlib.models.compartments as cpm
 from ndlib.utils import multi_runs
 
 class CustomDiffusionModel:
+    # define a number of standard diffusion models
     def __init__(self, statuses, compartments, transition_rules, 
                  parameters, model_name = None):
         self.statuses = statuses
