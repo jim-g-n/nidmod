@@ -8,6 +8,8 @@ Created on Tue Mar 29 10:28:04 2022
 import itertools
 import pandas as pd
 from netdiffanalyse.datahandling.dataintegration import FeatureSetup, MatchClassifier, NetworkIntegrator
+from netdiffanalyse.diffusionmodel.diffusionmodel import InitialisedDiffusionModel
+from netdiffanalyse.analyser.networkanalysis import ResultsAnalyser
 
 class CombinationBuilder:
     def __init__(self, block_setups, compare_setups, classifier_names, clustering_algs):
@@ -20,7 +22,6 @@ class CombinationBuilder:
         return list(itertools.product(self.block_setups, self.compare_setups, 
                                  self.classifier_names, self.clustering_algs))
         
-
 class ParameterSweeper:
     def __init__(self, integration_setups, graphs, training_matches = None):
         self.integration_setups = integration_setups
@@ -60,5 +61,33 @@ class ParameterSweeper:
             integrated_networks.append(network_integrator.integrate_network())
             
         return integrated_networks
+    
+class MultiNetworkDiffusion:
+    def __init__(self, graphs, custom_diffusion_model):
+        self.graphs = graphs
+        self.custom_diffusion_model = custom_diffusion_model
+        
+        graph_assc_diff_models = []
+        for graph in graphs:
+            initialised_diffusion_model = InitialisedDiffusionModel(graph, custom_diffusion_model)
+            graph_assc_diff_models.append(initialised_diffusion_model)
+            
+        self.graph_assc_diff_models = graph_assc_diff_models
+        
+    def run_diffusion_model(self, simulation_setup):
+        graph_assc_trends = []
+        for model in self.graph_assc_diff_models:
+            trends = model.run_diffusion_model(simulation_setup)
+            graph_assc_trends.append(trends)
+            
+        graph_assc_results_analysers = []
+        for i in range(len(self.graphs)):
+            results_analyser = ResultsAnalyser(self.graph_assc_diff_models[i].model, self.graphs[i],
+                                           graph_assc_trends[i])
+            graph_assc_results_analysers.append(results_analyser)
+            
+        return graph_assc_results_analysers
+            
+        
             
     
