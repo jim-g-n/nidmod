@@ -8,8 +8,10 @@ import networkx as nx
 from ndlib.viz.mpl.DiffusionTrend import DiffusionTrend
 from ndlib.viz.mpl.DiffusionPrevalence import DiffusionPrevalence
 from ndlib.viz.mpl.OpinionEvolution import OpinionEvolution
+from ndlib.viz.mpl.TrendComparison import DiffusionTrendComparison
 import future.utils
 import numpy as np
+import pandas as pd
 
 class ResultsAnalyser:
     def __init__(self, model, graph, trends):
@@ -82,6 +84,36 @@ class ResultsAnalyser:
                                           measurement_values))
         
         return aggregate_measurements
+    
+class MultiResultsAnalyser:
+    def __init__(self, results_analysers):
+        self.results_analysers = results_analysers
+        
+    def get_average_stat_comparison(self, indices = None):
+        stat_compare_df = pd.DataFrame()
+        if indices is None:
+            indices = np.arange(len(self.results_analysers))
+        for idx in indices:
+            stat_compare_df = stat_compare_df.append(self.results_analysers[idx].get_aggregate_statistics(),
+                                   ignore_index = True)
+        stat_compare_df.index = indices
+        return stat_compare_df
+    
+    def get_graph_prop_comparison(self, indices = None):
+        graph_compare_df = pd.DataFrame()
+        if indices is None:
+            indices = np.arange(len(self.results_analysers))
+        for idx in indices:
+            graph_compare_df = graph_compare_df.append(self.results_analysers[idx].get_graph_properties(),
+                                   ignore_index = True)
+        graph_compare_df.index = indices
+        return graph_compare_df
+        
+    def plot_trend_comparison(self, indices):
+        # plot sets of models and trends, haven't implemented plotting parms yet
+        viz = DiffusionTrendComparison([self.results_analysers[i].model for i in indices],
+                                       [self.results_analysers[i].trends for i in indices])
+        viz.plot()
         
         
     

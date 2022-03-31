@@ -9,7 +9,7 @@ import itertools
 import pandas as pd
 from netdiffanalyse.datahandling.dataintegration import FeatureSetup, MatchClassifier, NetworkIntegrator
 from netdiffanalyse.diffusionmodel.diffusionmodel import InitialisedDiffusionModel
-from netdiffanalyse.analyser.networkanalysis import ResultsAnalyser
+from netdiffanalyse.analyser.networkanalysis import ResultsAnalyser, MultiResultsAnalyser
 
 class CombinationBuilder:
     def __init__(self, block_setups, compare_setups, classifier_names, clustering_algs):
@@ -86,7 +86,7 @@ class MultiNetworkDiffusion:
                                            graph_assc_trends[i])
             graph_assc_results_analysers.append(results_analyser)
             
-        return graph_assc_results_analysers
+        return MultiResultsAnalyser(graph_assc_results_analysers)
             
         
             

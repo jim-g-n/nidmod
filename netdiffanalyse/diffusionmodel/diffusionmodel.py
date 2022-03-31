@@ -22,6 +22,16 @@ class CustomDiffusionModel:
         self.parameters = parameters
         if model_name is not None:
             self.model_name = model_name
+            
+    @classmethod
+    def SIR(cls, beta, gamma, fraction_infected):
+        statuses = ['Susceptible', 'Infected', 'Removed']
+        compartments = {'NodeStochastic': {'c1': [beta, 'Infected'], 'c2': [gamma]}}
+        transition_rules = [["Susceptible", "Infected", "c1"], ["Infected", "Removed", "c2"]]
+        model_parameters = [['fraction_infected', fraction_infected]]
+        model_name = 'SIR'
+        return cls(statuses, compartments, transition_rules, model_parameters,
+                   model_name)
         
 class InitialisedDiffusionModel:
     def __init__(self, graph, custom_diffusion_model):
