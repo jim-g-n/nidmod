@@ -38,6 +38,17 @@ class CustomDiffusionModel:
         model_name = 'SIR'
         return cls(statuses, compartments, transition_rules, model_parameters,
                    model_name)
+   
+    # creates a threshold model with the given parameters
+    @classmethod
+    def Threshold(cls, threshold, fraction_infected):
+        statuses = ['Susceptible', 'Infected']
+        compartments = {'NodeThreshold': {'c1': [threshold, 'Infected']}}
+        transition_rules = [['Susceptible', 'Infected', 'c1']]
+        model_parameters = [['fraction_infected', fraction_infected]]
+        model_name = 'Threshold'
+        return cls(statuses, compartments, transition_rules, model_parameters,
+                   model_name)
         
 class InitialisedDiffusionModel:
     '''
