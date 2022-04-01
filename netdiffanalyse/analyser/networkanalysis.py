@@ -14,6 +14,9 @@ import numpy as np
 import pandas as pd
 
 class ResultsAnalyser:
+    '''
+    Class for analysing diffusion results and the graph itself
+    '''
     def __init__(self, model, graph, trends):
         self.model = model
         self.graph = graph
@@ -22,7 +25,8 @@ class ResultsAnalyser:
         self.srev = {v: k for k, v in future.utils.iteritems(statuses)}
         self.num_nodes = self.graph.number_of_nodes()
         self.num_sims = len(trends)
-        
+     
+    # returns a dictionary of graph properties
     def get_graph_properties(self):
         num_nodes = len(self.graph.nodes())
         num_edges = len(self.graph.edges())
@@ -37,13 +41,15 @@ class ResultsAnalyser:
         
         return properties_dict
     
+    # plots the diffusion trends
     def plot_diff_trend(self, plot_params = None):
         viz = DiffusionTrend(self.model, self.trends)
         if plot_params is not None:
             viz.plot(*plot_params)
         else:
             viz.plot()
-        
+    
+    # plots the diffusion prevalence (derivative)
     def plot_diff_prevalence(self, plot_params = None):
         viz = DiffusionPrevalence(self.model, self.trends)
         if plot_params is not None:
@@ -51,14 +57,16 @@ class ResultsAnalyser:
         else:
             viz.plot()        
     
+    # plots opinion evolution
     def plot_opinion_evolution(self, plot_params = None):
         viz = OpinionEvolution(self.model, self.trends)
         if plot_params is not None:
             viz.plot(*plot_params)
         else:
             viz.plot()
-        
-    def get_aggregate_statistics(self):
+    
+    # returns a dictionary of statistics from the trends
+    def get_average_statistics(self):
         # calculate aggregate statistics (peaks, final, times to peak and stable)
         #stability_rand.append([trends[j]['trends']['node_count'][0].index(trends[j]['trends']['node_count'][0][-1]) for j in range(10)])
         #peak_time_rand.append([trends[j]['trends']['node_count'][1].index(max(trends[j]['trends']['node_count'][1])) for j in range(10)])
@@ -80,25 +88,30 @@ class ResultsAnalyser:
         
         measurement_names = peak_state_names + final_state_names
         measurement_values = np.concatenate((peak_vals, final_vals))
-        aggregate_measurements = dict(zip(measurement_names, 
+        average_measurements = dict(zip(measurement_names, 
                                           measurement_values))
         
-        return aggregate_measurements
+        return average_measurements
     
 class MultiResultsAnalyser:
+    '''
+    Class for jointly analysing multiple graphs and diffusion results
+    '''
     def __init__(self, results_analysers):
         self.results_analysers = results_analysers
-        
+    
+    # returns a dataframe of average trend statistics for the indexed graphs
     def get_average_stat_comparison(self, indices = None):
         stat_compare_df = pd.DataFrame()
         if indices is None:
             indices = np.arange(len(self.results_analysers))
         for idx in indices:
-            stat_compare_df = stat_compare_df.append(self.results_analysers[idx].get_aggregate_statistics(),
+            stat_compare_df = stat_compare_df.append(self.results_analysers[idx].get_average_statistics(),
                                    ignore_index = True)
         stat_compare_df.index = indices
         return stat_compare_df
     
+    # returns a dataframe of graph statistics for the indexed graphs
     def get_graph_prop_comparison(self, indices = None):
         graph_compare_df = pd.DataFrame()
         if indices is None:

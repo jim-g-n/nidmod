@@ -51,7 +51,7 @@ class FeatureSetup:
         else:
             self.candidate_links = indexer.index(network_A_df)
     
-    # 
+    # calculate comparison features 
     def calculate_features(self):
         if hasattr(self, 'network_B_df'):
             return(self.comparer.compute(self.candidate_links, self.network_A_df, self.network_B_df))
@@ -74,6 +74,7 @@ class MatchClassifier:
         if training_matches is not None:
             self.training_matches = training_matches
     
+    # fits the model
     def fit_model(self):
         model = getattr(recordlinkage, self.match_classifier_name)()
         if hasattr(self, 'training_matches'): 
@@ -93,13 +94,13 @@ class NetworkIntegrator:
     
     Can return the integrated network based on the matches
     '''
-    def __init__(self, graphs, matches, clustering_alg):
+    def __init__(self, graphs, matches):
         self.graphs = graphs
         self.matches = matches
-        self.clustering_alg = clustering_alg
-        
-    def integrate_network(self):
-        used_clustering_alg = getattr(netdiffanalyse.integration_utils, self.clustering_alg)
+    
+    # integrates the network based on matches and the clustering algorithm
+    def integrate_network(self, clustering_alg):
+        used_clustering_alg = getattr(netdiffanalyse.integration_utils, clustering_alg)
         return used_clustering_alg(self.graphs, self.matches)
         
         

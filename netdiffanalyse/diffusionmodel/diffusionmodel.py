@@ -3,7 +3,6 @@
 Created on Fri Mar 18 11:13:13 2022
 
 @author: jnevin
--Supports ndlib CompositeModels
 -Doesn't support cascading or conditional compartments
 """
 
@@ -13,7 +12,13 @@ import ndlib.models.compartments as cpm
 from ndlib.utils import multi_runs
 
 class CustomDiffusionModel:
-    # define a number of standard diffusion models
+    '''
+    Class for storing a custom diffusion model
+    
+    The custom diffusion model can be defined based on the ndlib CompositeModel
+    
+    There are some standard models implemented as well
+    '''
     def __init__(self, statuses, compartments, transition_rules, 
                  parameters, model_name = None):
         self.statuses = statuses
@@ -22,7 +27,8 @@ class CustomDiffusionModel:
         self.parameters = parameters
         if model_name is not None:
             self.model_name = model_name
-            
+    
+    # creates an SIR model with the given parameters
     @classmethod
     def SIR(cls, beta, gamma, fraction_infected):
         statuses = ['Susceptible', 'Infected', 'Removed']
@@ -34,6 +40,9 @@ class CustomDiffusionModel:
                    model_name)
         
 class InitialisedDiffusionModel:
+    '''
+    Class to initialise and run the supplied custom diffusion model on the supplied graph
+    '''
     def __init__(self, graph, custom_diffusion_model):
         self.graph = graph
         self.model = gc.CompositeModel(self.graph)
@@ -59,10 +68,12 @@ class InitialisedDiffusionModel:
         for parameter in custom_diffusion_model.parameters:
             config.add_model_parameter(*parameter)
         self.model.set_initial_status(config)
-        
+    
+    # returns the initialised diffusion model
     def get_initialised_model(self):
         return self.model
     
+    # performs an ndlib multi_runs based on given parameters
     def run_diffusion_model(self, parameters):
         trends = multi_runs(self.model, *parameters)
         return trends

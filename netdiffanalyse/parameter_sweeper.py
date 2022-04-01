@@ -12,6 +12,13 @@ from netdiffanalyse.diffusionmodel.diffusionmodel import InitialisedDiffusionMod
 from netdiffanalyse.analyser.networkanalysis import ResultsAnalyser, MultiResultsAnalyser
 
 class CombinationBuilder:
+    '''
+    A class for building all possible integration setups
+    
+    Inputs are lists, where each element is a dictionary defining a blocking/compare/classifer/clustering alg setup
+    
+    Output is a list where each element is a full integration setup
+    '''
     def __init__(self, block_setups, compare_setups, classifier_names, clustering_algs):
         self.block_setups = block_setups
         self.compare_setups = compare_setups
@@ -23,6 +30,13 @@ class CombinationBuilder:
                                  self.classifier_names, self.clustering_algs))
         
 class ParameterSweeper:
+    '''
+    Class for calculating different possible integrated graphs based on different integration setups
+    
+    Input is a list of integration setups, a list of graphs, and a set of training matches
+    
+    Output is a list of integrated networks
+    '''
     def __init__(self, integration_setups, graphs, training_matches = None):
         self.integration_setups = integration_setups
         self.graphs = graphs
@@ -54,15 +68,22 @@ class ParameterSweeper:
             self.pred_matches = self.fit_model.predict(self.features)
             
             if len(self.graphs) == 1:
-                network_integrator = NetworkIntegrator(self.graphs[0], self.pred_matches, clustering_alg)
+                network_integrator = NetworkIntegrator(self.graphs[0], self.pred_matches)
             else:
-                network_integrator = NetworkIntegrator(self.graphs, self.pred_matches, clustering_alg)
+                network_integrator = NetworkIntegrator(self.graphs, self.pred_matches)
     
-            integrated_networks.append(network_integrator.integrate_network())
+            integrated_networks.append(network_integrator.integrate_network(clustering_alg))
             
         return integrated_networks
     
 class MultiNetworkDiffusion:
+    '''
+    Class for running a custom diffusion model on different graphs
+    
+    Input is a set of graphs and a custom diffusion model
+    
+    Output is a MultiResultsAnalyser object
+    '''
     def __init__(self, graphs, custom_diffusion_model):
         self.graphs = graphs
         self.custom_diffusion_model = custom_diffusion_model
