@@ -6,8 +6,8 @@ Created on Thu Mar 24 13:32:12 2022
 """
 
 from netdiffanalyse.datahandling.dataintegration import FeatureSetup, MatchClassifier, NetworkIntegrator
-from netdiffanalyse.diffusionmodel.diffusionmodel import CustomDiffusionModel, InitialisedDiffusionModel
-from netdiffanalyse.analyser.networkanalysis import ResultsAnalyser
+from netdiffanalyse.diffusionmodel.ndlib_diffusionmodel import CustomDiffusionModel, InitialisedDiffusionModel
+from netdiffanalyse.analyser.ndlib_networkanalysis import ResultsAnalyser
 import pandas as pd
 
 class IntegrationPipeline:
