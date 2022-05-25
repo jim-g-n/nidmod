@@ -8,8 +8,8 @@ Created on Tue Mar 29 10:28:04 2022
 import itertools
 import pandas as pd
 from netdiffanalyse.datahandling.dataintegration import FeatureSetup, MatchClassifier, NetworkIntegrator
-from netdiffanalyse.diffusionmodel.ndlib_diffusionmodel import InitialisedDiffusionModel
-from netdiffanalyse.analyser.ndlib_networkanalysis import ResultsAnalyser, MultiResultsAnalyser
+from netdiffanalyse.diffusionmodel.diffusionmodel import InitialisedDiffusionModel
+from netdiffanalyse.analyser.networkanalysis import ResultsAnalyser, MultiResultsAnalyser
 
 class CombinationBuilder:
     '''
@@ -33,7 +33,7 @@ class ParameterSweeper:
     '''
     Class for calculating different possible integrated graphs based on different integration setups
     
-    Input is a list of integration setups, a list of graphs, and a set of training matches
+    Input is a list of integration setups, a list of graphs, and (optionally) a set of training matches
     
     Output is a list of integrated networks
     '''

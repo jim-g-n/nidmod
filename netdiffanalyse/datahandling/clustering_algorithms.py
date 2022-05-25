@@ -5,11 +5,27 @@ Created on Tue Mar 22 12:52:48 2022
 @author: jnevin
 """
 
+'''
+Point for defining clustering algorithms.
+
+These algorithms should be functions that take as input a graph or list of graphs
+and a pandas MultiIndex representing matches based on attributes for nodes in the graph.
+
+The algorithm should return a single, integrated graph.
+'''
+
 import networkx as nx
 import numpy as np
 from cdlib import algorithms
 
 def walktrap_integration(graph, matches):
+    '''
+    An algorithm based on clustering matches based on walktrap communities.
+    
+    A graph is built based on the matches and community detection is run on this graph.
+    Nodes within the same community are taken to represent the same entity.
+    Same entity nodes are combined into a single node.
+    '''
     adj_graph = graph.copy()
     match_graph = nx.Graph()
     match_graph.add_edges_from(list(matches))
@@ -33,3 +49,16 @@ def walktrap_integration(graph, matches):
                 adj_graph = nx.contracted_nodes(adj_graph, component[0], node, self_loops = False)
 
     return adj_graph
+
+def multigraph_walktrap_integration(graphs, matches):
+    '''
+    Performs the walktrap integration defined above on a list of graphs.
+    
+    Graphs are first all combined into one large graph, and then the walktrap integration
+    is applied.
+    '''
+    adj_graph = graphs[0]
+    for graph in graphs[1:]:
+        adj_graph = nx.compose(adj_graph,graph)
+    
+    return walktrap_integration(adj_graph, matches)

@@ -9,7 +9,7 @@ Created on Wed Mar 16 16:36:59 2022
 import recordlinkage
 import recordlinkage.index
 import recordlinkage.compare
-import netdiffanalyse.integration_utils
+import netdiffanalyse.datahandling.clustering_algorithms as clustering_algorithms
 
     
 class FeatureSetup:
@@ -100,7 +100,7 @@ class NetworkIntegrator:
     
     # integrates the network based on matches and the clustering algorithm
     def integrate_network(self, clustering_alg):
-        used_clustering_alg = getattr(netdiffanalyse.integration_utils, clustering_alg)
+        used_clustering_alg = getattr(clustering_algorithms, clustering_alg)
         return used_clustering_alg(self.graphs, self.matches)
         
         

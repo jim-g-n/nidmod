@@ -6,15 +6,15 @@ Created on Thu Mar 24 13:32:12 2022
 """
 
 from netdiffanalyse.datahandling.dataintegration import FeatureSetup, MatchClassifier, NetworkIntegrator
-from netdiffanalyse.diffusionmodel.ndlib_diffusionmodel import CustomDiffusionModel, InitialisedDiffusionModel
-from netdiffanalyse.analyser.ndlib_networkanalysis import ResultsAnalyser
+from netdiffanalyse.diffusionmodel.diffusionmodel import CustomDiffusionModel, InitialisedDiffusionModel
+from netdiffanalyse.analyser.networkanalysis import ResultsAnalyser
 import pandas as pd
 
 class IntegrationPipeline:
     '''
     Class for entire integration and diffusion model pipeline
     
-    Can provide all the individual steps of the process and run in one go
+    Users can provide all the individual steps of the process and run in one go
     '''
     def __init__(self, graphs, blocks, compares, classifier_name,
                  clustering_alg, statuses, compartments, transition_rules,
