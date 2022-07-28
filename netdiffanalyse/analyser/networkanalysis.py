@@ -7,7 +7,6 @@ Created on Fri Mar 18 15:18:23 2022
 import networkx as nx
 from ndlib.viz.mpl.DiffusionTrend import DiffusionTrend
 from ndlib.viz.mpl.DiffusionPrevalence import DiffusionPrevalence
-from ndlib.viz.mpl.OpinionEvolution import OpinionEvolution
 from ndlib.viz.mpl.TrendComparison import DiffusionTrendComparison
 import future.utils
 import numpy as np
@@ -56,14 +55,6 @@ class ResultsAnalyser:
             viz.plot(*plot_params)
         else:
             viz.plot()        
-    
-    # plots opinion evolution
-    def plot_opinion_evolution(self, plot_params = None):
-        viz = OpinionEvolution(self.model, self.trends)
-        if plot_params is not None:
-            viz.plot(*plot_params)
-        else:
-            viz.plot()
     
     # returns a dictionary of statistics from the trends
     def get_average_statistics(self):
@@ -122,10 +113,11 @@ class MultiResultsAnalyser:
         graph_compare_df.index = indices
         return graph_compare_df
         
-    def plot_trend_comparison(self, indices):
+    def plot_trend_comparison(self, indices, statuses = 'Infected'):
         # plot sets of models and trends, haven't implemented plotting parms yet
         viz = DiffusionTrendComparison([self.results_analysers[i].model for i in indices],
-                                       [self.results_analysers[i].trends for i in indices])
+                                       [self.results_analysers[i].trends for i in indices],
+                                       statuses = statuses)
         viz.plot()
         
         
