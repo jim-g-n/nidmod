@@ -1,0 +1,3 @@
+febrl1 (https://recordlinkage.readthedocs.io/en/latest/ref-datasets.html)
+online social networks (https://www.aminer.org/cosnet)
+coauthor networks (https://www.stat.cmu.edu/~jiashun/StatNetwork/PhaseOne/)
